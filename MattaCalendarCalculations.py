@@ -226,14 +226,23 @@ parser.add_argument("-t", "--type", choices=("G", "J", "M"), default="G", help="
 args = parser.parse_args()
 indatestr = args.year + '.' + ('00' + args.month)[-2:] + '.' + ('00' + args.day)[-2:]
 if args.type == "G":
-    print( "%-30s" % "date in Grigorian calendar:", indatestr)
-    print( "%-30s" % "date in Julian calendar:", pCJDNToJulian(pGregorianToCJDN(args.year, args.month, args.day)) )
-    print( "%-30s" % "date in Milankovic calendar:", pCJDNToMilankovic(pGregorianToCJDN(args.year, args.month, args.day)) )
+    indateCJDN = pGregorianToCJDN(args.year, args.month, args.day)
 elif args.type == "J":
-    print( "%-30s" % "date in Julian calendar:", indatestr)
-    print( "%-30s" % "date in Grigorian calendar:", pCJDNToGregorian(pJulianToCJDN(args.year, args.month, args.day)) )
-    print( "%-30s" % "date in Milankovic calendar:", pCJDNToMilankovic(pJulianToCJDN(args.year, args.month, args.day)) )
+    indateCJDN = pJulianToCJDN(args.year, args.month, args.day)
 elif args.type == "M":
-    print( "%-30s" % "date in Milankovic calendar:", indatestr)
-    print( "%-30s" % "date in Grigorian calendar:", pCJDNToGregorian(pMilankovicToCJDN(args.year, args.month, args.day)) )
-    print( "%-30s" % "date in Julian calendar:", pCJDNToJulian(pMilankovicToCJDN(args.year, args.month, args.day)) )
+    indateCJDN = pMilankovicToCJDN(args.year, args.month, args.day)
+if indateCJDN != False:
+    if args.type == "G":
+        print( "%-30s" % "date in Grigorian calendar:", indatestr)
+        print( "%-30s" % "date in Julian calendar:", pCJDNToJulian(indateCJDN) )
+        print( "%-30s" % "date in Milankovic calendar:", pCJDNToMilankovic(indateCJDN) )
+    elif args.type == "J":
+        print( "%-30s" % "date in Julian calendar:", indatestr)
+        print( "%-30s" % "date in Grigorian calendar:", pCJDNToGregorian(indateCJDN) )
+        print( "%-30s" % "date in Milankovic calendar:", pCJDNToMilankovic(indateCJDN) )
+    elif args.type == "M":
+        print( "%-30s" % "date in Milankovic calendar:", indatestr)
+        print( "%-30s" % "date in Grigorian calendar:", pCJDNToGregorian(indateCJDN) )
+        print( "%-30s" % "date in Julian calendar:", pCJDNToJulian(indateCJDN) )
+else:
+    print("can't calculate CjDN for input date!")
