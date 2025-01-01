@@ -6,12 +6,7 @@ Updated 28/08/2022 with simpler Day of Week calculation,
    Also, updated to check for minimum dates for each calendar
 
 @author: matta
-
-Contains functions for finding the date of Easter according to the
-   Gregorian, Julian, and Orthodox calendars.
 '''
-
-
 import datetime
 from math import floor
 from math import fmod
@@ -53,8 +48,7 @@ def pGregorianToCJDN(sYear, sMonth, sDay):
     return iJ
 
 def pCJDNToGregorian(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
-    ''' Returns a Gregorian date is ISO 8601 YYYY-MM-DD format from a given
-        Chronological Julian Day Number (CJDN).
+    ''' Returns a Gregorian date from a given Chronological Julian Day Number (CJDN).
         If only part of the date is required (e.g. just the day), this is returned as an integer.
     '''
 
@@ -82,9 +76,8 @@ def pCJDNToGregorian(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
     if bDoDay:
         return iDay
 
-    #Return the ISO 8601 date string
-    sISO8601Date = ('0000' + str(iYear))[-4:] + '-' + ('00' + str(iMonth))[-2:] + '-' + ('00' + str(iDay))[-2:]
-    return sISO8601Date
+    result = str(iYear) + '.' + ('00' + str(iMonth))[-2:] + '.' + ('00' + str(iDay))[-2:]
+    return result
 
 def pMilankovicToCJDN(sYear, sMonth, sDay):
     ''' Converts a Revised Julian or Milanković date passed in a three strings (year, month, day) to a
@@ -113,8 +106,7 @@ def pMilankovicToCJDN(sYear, sMonth, sDay):
     return iJ
 
 def pCJDNToMilankovic(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
-    ''' Returns a Revised Julian date is ISO 8601 YYYY-MM-DD format from a given
-        Chronological Julian Day Number (CJDN).
+    ''' Returns a Revised Julian date from a given Chronological Julian Day Number (CJDN).
         If only part of the date is required (e.g. just the day), this is returned as an integer.
     '''
 
@@ -142,9 +134,8 @@ def pCJDNToMilankovic(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
     if bDoDay:
         return iDay
 
-    #Return the ISO 8601 date string
-    sISO8601Date = ('0000' + str(iYear))[-4:] + '-' + ('00' + str(iMonth))[-2:] + '-' + ('00' + str(iDay))[-2:]
-    return sISO8601Date
+    result = str(iYear) + '.' + ('00' + str(iMonth))[-2:] + '.' + ('00' + str(iDay))[-2:]
+    return result
 
 def pJulianToCJDN(sYear, sMonth, sDay):
     ''' Converts a Julian date passed in a three strings (year, month, day) to a
@@ -172,8 +163,7 @@ def pJulianToCJDN(sYear, sMonth, sDay):
     return iJ
 
 def pCJDNToJulian(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
-    ''' Returns a Julian date is ISO 8601 YYYY-MM-DD format from a given
-        Chronological Julian Day Number (CJDN).
+    ''' Returns a Julian date from a given Chronological Julian Day Number (CJDN).
         If only part of the date is required (e.g. just the day), this is returned as an integer.
     '''
 
@@ -199,18 +189,17 @@ def pCJDNToJulian(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
     if bDoDay:
         return iDay
 
-    #Return the ISO 8601 date string
-    sISO8601Date = ('0000' + str(iYear))[-4:] + '-' + ('00' + str(iMonth))[-2:] + '-' + ('00' + str(iDay))[-2:]
-    return sISO8601Date
+    result = str(iYear) + '.' + ('00' + str(iMonth))[-2:] + '.' + ('00' + str(iDay))[-2:]
+    return result
 
 def DoW(iCJDN, iEDM=None):
     ''' Calculates the day of the week for a given date, for a given calendar.
         The iEDM is no longer required (post updated code 2022-08-28), however
-        the parameter remains to ensure backwards compatibility with code 
+        the parameter remains to ensure backwards compatibility with code
         that uses the earlier version.
         iEDM = 1 for Julian; 2 for Revised Julian, and 3 for Gregorian calendar.
     '''
-    # Constant defining the days in a week for each of the Gregorian, 
+    # Constant defining the days in a week for each of the Gregorian,
     #   Revised Julian, and Julian calendars.
     DAYS_IN_WEEK = 7
 
@@ -227,3 +216,24 @@ def DoW(iCJDN, iEDM=None):
         iD = 7
 
     return iD
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("year", type=str)
+parser.add_argument("month", type=str)
+parser.add_argument("day", type=str)
+parser.add_argument("-t", "--type", choices=("G", "J", "M"), default="G", help="calendar type for input date: G - Grigorian; J - Julian; M - Revised julian (Milanković)")
+args = parser.parse_args()
+indatestr = args.year + '.' + ('00' + args.month)[-2:] + '.' + ('00' + args.day)[-2:]
+if args.type == "G":
+    print( "%-30s" % "date in Grigorian calendar:", indatestr)
+    print( "%-30s" % "date in Julian calendar:", pCJDNToJulian(pGregorianToCJDN(args.year, args.month, args.day)) )
+    print( "%-30s" % "date in Milankovic calendar:", pCJDNToMilankovic(pGregorianToCJDN(args.year, args.month, args.day)) )
+elif args.type == "J":
+    print( "%-30s" % "date in Julian calendar:", indatestr)
+    print( "%-30s" % "date in Grigorian calendar:", pCJDNToGregorian(pJulianToCJDN(args.year, args.month, args.day)) )
+    print( "%-30s" % "date in Milankovic calendar:", pCJDNToMilankovic(pJulianToCJDN(args.year, args.month, args.day)) )
+elif args.type == "M":
+    print( "%-30s" % "date in Milankovic calendar:", indatestr)
+    print( "%-30s" % "date in Grigorian calendar:", pCJDNToGregorian(pMilankovicToCJDN(args.year, args.month, args.day)) )
+    print( "%-30s" % "date in Julian calendar:", pCJDNToJulian(pMilankovicToCJDN(args.year, args.month, args.day)) )
