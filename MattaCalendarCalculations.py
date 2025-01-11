@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 '''
 Created on 27/01/2013
+
 Updated 28/08/2022 with simpler Day of Week calculation,
    thanks to beardley52.
    Also, updated to check for minimum dates for each calendar
 
+Updated 11/01/2025 by Vladimir Abramov :
+   replace float division to integer division, to fix big year numbers calculations;
+   change output format;
+   add CLI;
+
 @author: matta
 '''
-import datetime
-from math import floor
-from math import fmod
 
 # Constants
 # Although the Julian calendar was introducd in 45 BC, its leap years
@@ -38,12 +41,12 @@ def pGregorianToCJDN(sYear, sMonth, sDay):
         return False
 
     # calculation
-    iC0 = floor((iMonth - 3) / 12)
+    iC0 = (iMonth - 3) // 12
     iX4 = iYear + iC0
-    iX3 = floor(iX4 / 100)
-    iX2 = int(fmod(iX4, 100))
+    iX3 = iX4 // 100
+    iX2 = iX4 % 100
     iX1 = iMonth - (12 * iC0) - 3
-    iJ = floor((146097 * iX3) / 4) + floor((36525 * iX2) / 100) + floor(((153 * iX1) + 2) / 5) + iDay + 1721119
+    iJ = ((146097 * iX3) // 4) + ((36525 * iX2) // 100) + (((153 * iX1) + 2) // 5) + iDay + 1721119
 
     return iJ
 
@@ -57,15 +60,15 @@ def pCJDNToGregorian(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
 
     #Perform the calculation
     iK3 = (4 * (iCJDN - 1721120)) + 3
-    iX3 = floor(iK3 / 146097)
-    iK2 = (100 * floor(int(fmod(iK3, 146097)) / 4)) + 99
-    iX2 = floor(iK2 / 36525)
-    iK1 = (5 * floor(int(fmod(iK2, 36525)) / 100)) + 2
-    iX1 = floor(iK1 / 153)
-    iC0 = floor((iX1 + 2) / 12)
+    iX3 = iK3 // 146097
+    iK2 = 100 * ((iK3 % 146097) // 4) + 99
+    iX2 = iK2 // 36525
+    iK1 = 5 * ((iK2 % 36525) // 100) + 2
+    iX1 = (iK1 // 153)
+    iC0 = ((iX1 + 2) // 12)
     iYear = (100 * iX3) + iX2 + iC0
     iMonth = (iX1 - (12 * iC0)) + 3
-    iDay = floor(int(fmod(iK1, 153)) / 5) + 1
+    iDay = (iK1 % 153) // 5 + 1
 
     #Return integer part, if only one part of the date is required.
     #Start at year, and rudely ignore any subsequent integers requested.
@@ -96,12 +99,12 @@ def pMilankovicToCJDN(sYear, sMonth, sDay):
     if iYear < MINIMUM_YEAR_MILANKOVIC:
         return False
 
-    iC0 = floor((iMonth - 3) / 12)
+    iC0 = ((iMonth - 3) // 12)
     iX4 = iYear + iC0
-    iX3 = floor(iX4 / 100)
-    iX2 = int(fmod(iX4, 100))
+    iX3 = (iX4 // 100)
+    iX2 = iX4 % 100
     iX1 = iMonth - (12 * iC0) - 3
-    iJ = floor(((328718 * iX3) + 6) / 9) + floor((36525 * iX2) / 100) + floor(((153 * iX1) + 2) / 5) + iDay + 1721119
+    iJ = (((328718 * iX3) + 6) // 9) + ((36525 * iX2) // 100) + (((153 * iX1) + 2) // 5) + iDay + 1721119
 
     return iJ
 
@@ -115,15 +118,15 @@ def pCJDNToMilankovic(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
 
     #Perform the calculation
     iK3 = (9 * (iCJDN - 1721120)) + 2
-    iX3 = floor(iK3 / 328718)
-    iK2 = (100 * floor(int(fmod(iK3, 328718)) / 9)) + 99
-    iX2 = floor(iK2 / 36525)
-    iK1 = (5 * floor(int(fmod(iK2, 36525)) / 100)) + 2
-    iX1 = floor(iK1 / 153)
-    iC0 = floor((iX1 + 2) / 12)
+    iX3 = (iK3 // 328718)
+    iK2 = 100 * ((iK3 % 328718) // 9) + 99
+    iX2 = (iK2 // 36525)
+    iK1 = 5 * ((iK2 % 36525) // 100) + 2
+    iX1 = (iK1 // 153)
+    iC0 = ((iX1 + 2) // 12)
     iYear = (100 * iX3) + iX2 + iC0
     iMonth = (iX1 - (12 * iC0)) + 3
-    iDay = floor(int(fmod(iK1, 153)) / 5) + 1
+    iDay = ((iK1 % 153) // 5) + 1
 
     #Return integer part, if only one part of the date is required.
     #Start at year, and rudely ignore any subsequent integers requested.
@@ -155,9 +158,9 @@ def pJulianToCJDN(sYear, sMonth, sDay):
         return False
 
     iJ0 = 1721117
-    iC0 = floor((iMonth - 3) / 12)
-    iJ1 = floor(((iC0 + iYear) * 1461) / 4)
-    iJ2 = floor(((153 * iMonth) - (1836 * iC0) - 457) / 5)
+    iC0 = ((iMonth - 3) // 12)
+    iJ1 = (((iC0 + iYear) * 1461) // 4)
+    iJ2 = (((153 * iMonth) - (1836 * iC0) - 457) // 5)
     iJ = iJ1 + iJ2 + iDay + iJ0
 
     return iJ
@@ -173,12 +176,12 @@ def pCJDNToJulian(iCJDN, bDoYear=False, bDoMonth=False, bDoDay=False):
     #Perform the calculation
     iY2 = iCJDN - 1721118
     iK2 = (4 * iY2) + 3
-    iK1 = (5 * floor(int(fmod(iK2, 1461)) / 4)) + 2
-    iX1 = floor(iK1 / 153)
-    iC0 = floor((iX1 + 2) / 12)
-    iYear = floor(iK2 / 1461) + iC0
+    iK1 = 5 * ((iK2 % 1461) // 4) + 2
+    iX1 = (iK1 // 153)
+    iC0 = ((iX1 + 2) // 12)
+    iYear = (iK2 // 1461) + iC0
     iMonth = (iX1 - (12 * iC0)) + 3
-    iDay = floor(int(fmod(iK1, 153)) / 5) + 1
+    iDay = (iK1 % 153) // 5 + 1
 
     #Return integer part, if only one part of the date is required.
     #Start at year, and rudely ignore any subsequent integers requested.
